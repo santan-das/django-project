@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h2>Striped Rows</h2>
+  <p><button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#createModal">Add User</button>
+</p>            
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+ <!--      <tr>
+        <td>John</td>
+        <td>Doe</td>
+        <td>john@example.com</td>
+      </tr> -->
+
+      <tr>
+        {% for s in result %}
+          <td>{{ s.3 }}</td>
+          <td>{{ s.1 }}</td>
+          <td><!-- <button onclick="getDetails({{s.0}})">Edit</button> -->
+            <button type="button" class="btn btn-info btn-lg" data-toggle="modal" onclick="getDetails({{s.0}})" data-target="#myModal">Edit</button>
+          </td>
+           
+      </tr>
+       {% endfor %} 
+      
+  
+    </tbody>
+  </table>
+</div>
+
+
+  <!-- update Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">User Details</h4>
+        </div>
+        <div class="modal-body">
+              <div class="form-group">
+              <label for="usr">Name:</label>
+              <input type="text" class="form-control" id="username" name="username">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- insert -->
+
+   <div class="modal fade" id="createModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">User Details</h4>
+        </div>
+        <div class="modal-body">
+              <form id="createuserform">
+                {% csrf_token %}
+                    <div class="form-group">
+                      <label for="email">Name:</label>
+                      <input type="text" class="form-control" id="nametxt" placeholder="Enter email" name="nametxt">
+                    </div>
+                    <div class="form-group">
+                      <label for="pwd">Email:</label>
+                      <input type="text" class="form-control" id="emailtxt" placeholder="Enter password" name="emailtxt">
+                    </div>
+                   
+                    <button type="submit" class="btn btn-default">Submit</button>
+          </form>
+        </div>
+        <div class="modal-footer">
+         
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</body>
+<script type="text/javascript">
+  function getDetails(id){
+     $.ajax({    //create an ajax request to display.php
+        type: "GET",
+        url: "/get-user-details/",   
+        //dataType: "json",          
+        data : {
+                id : id
+                },               
+        success: function(response){                    
+            //$("#responsecontainer").html(response); 
+            //alert(response.userdata['3']);
+            $("#username").val(response.userdata['3']);
+        }
+
+      });
+  }
+
+ 
+   $("#createuserform").on("submit", function(e){
+      e.preventDefault();
+
+      var name  = $("#nametxt").val();
+      var email = $("#emailtxt").val();
+      //var name = $("#nametxt").val();
+      $.ajax({    //create an ajax request to display.php
+        type: "POST",
+        url: "/submit-user/",   
+        //dataType: "json",          
+        data : {
+                name : name,
+                email:email,
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                },               
+        success: function(response){     
+          alert(response.lastid);
+        }
+
+      });
+  });
+ 
+</script>
+</html>
